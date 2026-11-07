@@ -1,159 +1,72 @@
-# Turborepo starter
+# yespiz
 
-This Turborepo starter is maintained by the Turborepo core team.
+yespiz connects a shared pizza menu with restaurant capacity, checkout and courier handover. The customer, partner and administration portals use the same NestJS API.
 
-## Using this example
+## Run locally
 
-Run the following command:
-
-```sh
-npx create-turbo@latest
-```
-
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Use Node.js 24 or newer and install the workspace dependencies with the package manager version declared in package.json. Copy .env.example to .env.local, set your initial admin email and a password of at least 12 characters, and run from the repository root:
 
 ```sh
-cd my-turborepo
-turbo build
+node --env-file=.env.local scripts/start.mjs
 ```
 
-Without global `turbo`, use your package manager:
+| Portal                     | Local address                         |
+| -------------------------- | ------------------------------------- |
+| Customer and order history | http://127.0.0.1:3200                 |
+| Administration             | http://127.0.0.1:3201                 |
+| Restaurant                 | http://127.0.0.1:3202                 |
+| Courier                    | http://127.0.0.1:3202/courier         |
+| API health                 | http://127.0.0.1:3203/platform/health |
+
+The first administrator is created only when no admin account exists. Staff accounts and their restaurant memberships come from Administration. Customers can register in the storefront. The database starts with an empty menu and no restaurant accounts. SQLite data is stored in apps/backend/.yespiz.sqlite. Set YESPIZ_DB to an absolute path on a persistent volume for a hosted instance. Back up that file using a SQLite-aware backup process.
+
+### Rehearse the Vienna pilot locally
 
 ```sh
-cd my-turborepo
-npx turbo build
-npm exec turbo build
-npm exec turbo build
+node scripts/start.mjs --pilot
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+This starts a separate cash-only rehearsal on ports 3210–3213 with a fresh temporary SQLite database on each run. The launcher prints the database path. The fixtures include postcode **1010 Wien**, a Margherita, two test restaurants and a courier linked to both. All fixture accounts use `yespiz-local-pilot-only`.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+| Role | Portal | Fixture email |
+| --- | --- | --- |
+| Customer | http://127.0.0.1:3210 | `kunde@pilot.example` |
+| Admin | http://127.0.0.1:3211 | `admin@pilot.example` |
+| Restaurant | http://127.0.0.1:3212 | `mitte@pilot.example` or `ring@pilot.example` |
+| Courier | http://127.0.0.1:3212/courier | `fahrer@pilot.example` |
 
-```sh
-turbo build --filter=docs
-```
+To rehearse fallback, reject the offer in Mitte, then accept it in Ring before the next offer expires. Confirm cash as the customer, mark the order ready at Ring, hand it over with the pickup code and mark it delivered as the courier. In Ring, save a test receipt reference such as `RING-001` on the delivered order. Check it in customer order history and reconcile the cash in Administration. The automated HTTP test runs the same sequence and publishes the menu and restaurant settings from an empty database first. Run it with `npm run test:e2e --workspace backend`.
 
-Without global `turbo`:
+## Configure the workflow
 
-```sh
-npx turbo build --filter=docs
-npm exec turbo build --filter=docs
-npm exec turbo build --filter=docs
-```
+1. Add a delivery area with country, region, city and postal code. Configure a travel estimate and activate the area. Prices use EUR.
+2. Publish pizzas with prices, prep times and verified allergens. Add each seller's legal name, address, phone and email. Assign the menu and areas it serves, set its capacity and commission, and activate order intake. Enable cash or configure online checkout.
+3. Create restaurant and courier accounts. Assign one or more restaurants to each. An offer stays open for 45 seconds, subject to the 135-second search deadline. After reservation, the customer sees the seller and estimated delivery window and confirms the purchase.
+4. Prepare the order in the restaurant portal, mark it ready and issue a six-digit pickup code for a specific courier and up to three orders. The courier confirms pickup, delivers and records any cash received. The admin can reconcile cash, record resolutions and close a failed stop.
 
-### Develop
+## External services
 
-To develop all apps and packages, run the following command:
+### Local integration test
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+1. Install the [Stripe CLI](https://docs.stripe.com/cli/install) and sign in to the platform Sandbox. In a separate terminal, start the Connect listener and keep it running:
 
-```sh
-cd my-turborepo
-turbo dev
-```
+   ```sh
+   stripe login
+   stripe listen --forward-connect-to http://127.0.0.1:3203/platform/stripe/webhook
+   ```
 
-Without global `turbo`, use your package manager:
+2. Add the platform Sandbox key (`sk_test_…`) as `STRIPE_SECRET_KEY` and the listener signing secret (`whsec_…`) as `STRIPE_WEBHOOK_SECRET` in the root `.env.local`. Keep `YESPIZ_CUSTOMER_URL=http://127.0.0.1:3200`. Set the restaurant's `acct_…` in Administration → Restaurants → Stripe-Konto. Use a connected account in the same Sandbox with card payments enabled.
+3. Enable [Routes API](https://developers.google.com/maps/documentation/routes/get-api-key) in a billing-enabled Google Cloud project. Restrict the server-side API key to Routes API and set it as `GOOGLE_ROUTES_KEY` in the same file. Restart yespiz to load the keys.
+4. Reserve a customer order and choose **Online zur Zahlung**. Use Stripe's [test card](https://docs.stripe.com/testing#cards) `4242 4242 4242 4242`, a future expiry and any three-digit CVC. Verify the CLI forwards the Checkout event with HTTP 204 and yespiz moves the order to **Bestellung bestätigt**. The return URL alone does not confirm payment.
+5. Mark two or three orders for the same restaurant ready. Use nearby addresses with overlapping delivery windows. Issue a pickup PIN, redeem it as the assigned courier, and check the ordered stops. The route planner rejects a batch that cannot meet its delivery windows.
 
-```sh
-cd my-turborepo
-npx turbo dev
-npm exec turbo dev
-npm exec turbo dev
-```
+### Integration behavior
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+- Cash on delivery works without an external provider. The restaurant remains responsible for issuing its receipt. Cash reconciliation records verification of funds and does not transfer them.
+- For online payments, configure STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET and YESPIZ_CUSTOMER_URL. Configure each seller's Stripe Connect account ID in Administration. Subscribe the Connect webhook at /platform/stripe/webhook to checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed and checkout.session.expired. Online payment uses direct charges and application fees. Stripe Checkout displays Apple Pay and Google Pay where eligible, and Klarna can be enabled per seller after its eligibility is confirmed. Use test-mode credentials first. A signed webhook confirms payment. Unexpected late payments go to admin review for refund.
+- Set GOOGLE_ROUTES_KEY for a driving route matrix for two or three stops. The app compares the stop orders against each delivery window and the maximum travel time. Single-order pickup works without a route key. The driver can open navigation for the selected stop.
+- Customer order updates stream from the API and fall back to polling if the connection drops. Partner and admin queues refresh automatically. Initial ETA uses the configured travel estimate, order prep times and restaurant backlog.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+Use HTTPS for the three public portals and set YESPIZ_API_ORIGIN at Next.js build time to the private API origin. The Nest API binds to loopback by default. Expose the Stripe webhook through your HTTPS ingress. Run Next.js production builds for all three portals and launch the Nest output from apps/backend. Locally, pass --production to the launcher to use existing Next.js production builds.
 
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-npm exec turbo dev --filter=web
-npm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-npm exec turbo login
-npm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-npm exec turbo link
-npm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+See founder/product-spec.md for the product requirements and pilot acceptance criteria.

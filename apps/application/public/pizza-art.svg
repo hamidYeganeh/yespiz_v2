@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 510 365">
+  <defs>
+    <radialGradient id="dough">
+      <stop offset="0" stop-color="#efaa59"/><stop offset=".77" stop-color="#e7a05c"/>
+      <stop offset=".89" stop-color="#f4bc78"/><stop offset="1" stop-color="#b86a35"/>
+    </radialGradient>
+    <radialGradient id="sauce" cx="41%" cy="37%">
+      <stop stop-color="#f2734b"/><stop offset="1" stop-color="#b33624"/>
+    </radialGradient>
+    <radialGradient id="salami">
+      <stop stop-color="#cf5743"/><stop offset=".78" stop-color="#b94435"/><stop offset="1" stop-color="#863024"/>
+    </radialGradient>
+    <g id="pep">
+      <circle r="20" fill="#8e351d" opacity=".45" transform="translate(1 2)"/>
+      <circle r="19" fill="url(#salami)"/>
+      <path d="M-12 1l3-4 2 3-3 3zm14-12 4 2-2 4-3-3zm4 15 5 1-2 4-3-2zm-10 6 2 3-3 1z" fill="#ef9b6d" opacity=".87"/>
+    </g>
+    <g id="leaf">
+      <path d="M0 0C-7-20 5-33 26-36 31-15 19-3 0 0Z" fill="#406848"/>
+      <path d="M1-1 20-29M7-12 6-21m7 2 8-2" fill="none" stroke="#88a260" stroke-width="1.7" stroke-linecap="round"/>
+    </g>
+    <filter id="shadow" x="-30%" y="-30%" width="170%" height="180%"><feDropShadow dx="7" dy="17" stdDeviation="12" flood-color="#6a3529" flood-opacity=".28"/></filter>
+  </defs>
+  <path d="M33 92q40-31 96-35m-91 67q26-20 54-25m307 155q-16 40-58 68m72-56q-15 30-36 47" fill="none" stroke="#ad563b" stroke-width="3" opacity=".6" stroke-linecap="round"/>
+  <g transform="translate(257 178) rotate(-14)" filter="url(#shadow)">
+    <path d="M2-143C82-145 140-86 145-14 149 67 89 135 17 142-63 151-134 101-145 20-154-61-90-144 2-143Z" fill="url(#dough)" stroke="#a35b37" stroke-width="2"/>
+    <path d="M5-124C65-125 120-79 122-16 130 52 85 113 16 121-52 133-117 80-124 15-129-52-76-119 5-124Z" fill="url(#sauce)" stroke="#db8550" stroke-width="4"/>
+    <g fill="#ffd999" opacity=".92">
+      <path d="M-94-31q14-21 35-20t20 20-16 28q-16 2-36-6t-3-22ZM-39-93q23-14 40-6t7 22q-6 15-29 17t-21-11q-12-8 3-22ZM33-88q20-9 37 6t14 27q-9 7-32 3t-20-16q-12-9 1-20Z"/>
+      <path d="M14-31q11-11 29-6t20 21-7 17q-16 7-34 0T14-31ZM75-10q15-10 29 3t6 31-14 13q-28-2-24-18-7-15 3-29ZM-32 14q15-13 28-1t8 20-24 15-25-6q-9-17 13-28ZM-94 26q16-7 25 6t4 28-23 5q-14-8-14-22t8-17Z"/>
+      <path d="M-57 69q20-13 39-3t10 24-27 10q-18-5-27-16t5-15ZM21 50q24-14 44-1t12 27-27 18q-23 0-34-16t5-28Z"/>
+    </g>
+    <g fill="#b9653a" opacity=".6">
+      <ellipse cx="-93" cy="-89" rx="9" ry="4" transform="rotate(-38 -93 -89)"/><ellipse cx="-17" cy="-132" rx="8" ry="3"/><ellipse cx="66" cy="-115" rx="8" ry="3"/>
+      <ellipse cx="127" cy="-49" rx="3" ry="9"/><ellipse cx="136" cy="14" rx="3" ry="8"/><ellipse cx="76" cy="109" rx="9" ry="4"/>
+      <ellipse cx="-44" cy="125" rx="10" ry="4"/><ellipse cx="-109" cy="77" rx="5" ry="9"/><ellipse cx="-135" cy="5" rx="3" ry="8"/>
+    </g>
+    <use href="#pep" x="-67" y="-56"/><use href="#pep" x="19" y="-76"/><use href="#pep" x="80" y="-45"/>
+    <use href="#pep" x="-43" y="5"/><use href="#pep" x="35" y="10"/><use href="#pep" x="83" y="49"/>
+    <use href="#pep" x="-71" y="57"/><use href="#pep" x="3" y="80"/>
+    <use href="#leaf" transform="translate(-44 -65) rotate(44) scale(.78)"/><use href="#leaf" transform="translate(58 -31) rotate(85) scale(.8)"/>
+    <use href="#leaf" transform="translate(0 24) rotate(-45) scale(.95)"/><use href="#leaf" transform="translate(-45 80) rotate(-95) scale(.72)"/>
+    <use href="#leaf" transform="translate(48 83) rotate(135) scale(.75)"/><use href="#leaf" transform="translate(-90 -5) rotate(-50) scale(.65)"/>
+    <path d="M-19-104h4m-75 80h5m76-24h5m97 53h4m-27 73h4m-77 29h5m-50-74h4" stroke="#75402c" stroke-width="3" opacity=".55" stroke-linecap="round"/>
+  </g>
+</svg>

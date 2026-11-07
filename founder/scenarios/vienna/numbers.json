@@ -1,0 +1,32 @@
+{
+  "business": "yespiz · سناریوی آموزشی وین",
+  "unit": "order",
+  "currency": "EUR",
+  "status": "illustrative; no approved prices, commission, capacity, quotes or sales forecast",
+  "gross_customer_basket_including_vat": 25,
+  "commission_rate": 0.20,
+  "price": 5,
+  "variable": [
+    { "label": "کارمزد پرداخت آنلاین با ترکیب فرضی", "cost": 0.58 },
+    { "label": "تطبیق نقدی", "cost": 0.08 },
+    { "label": "پشتیبانی متغیر", "cost": 0.50 },
+    { "label": "مسیر، نشانی و پیام", "cost": 0.12 },
+    { "label": "سهم پلتفرم در خطا و جبران", "cost": 0.30 },
+    { "label": "یارانهٔ ارسال پلتفرم", "cost": 0.40 },
+    { "label": "ذخیرهٔ هزینهٔ اضافی تسویه و پرداخت", "cost": 0.22 }
+  ],
+  "fixed_monthly": [
+    { "label": "پشتیبانی شیفت و ادارهٔ عملیات", "cost": 2400 },
+    { "label": "فناوری و ابزار ثابت", "cost": 450 },
+    { "label": "جذب و پایش رستوران", "cost": 350 },
+    { "label": "حسابداری و بیمه", "cost": 300 }
+  ],
+  "startup": [
+    { "label": "راه‌اندازی فنی و اتصال", "cost": 4000 },
+    { "label": "قرارداد، حقوق و آموزش", "cost": 2000 },
+    { "label": "آزمون محلی", "cost": 1000 }
+  ],
+  "days_per_month": 30,
+  "plan_per_day": 55,
+  "ramp_per_day": [8, 12, 17, 22, 28, 34, 40, 45, 50, 55, 55, 55]
+}
